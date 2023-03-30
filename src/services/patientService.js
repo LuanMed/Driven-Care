@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import patientRepository from "../repositories/patientRepository.js";
+import { v4 as uuidV4 } from "uuid";
 
 async function signup ({name, email, password}) {
     const { rowCount } = await patientRepository.findByEmail(email);
@@ -9,6 +10,26 @@ async function signup ({name, email, password}) {
     await patientRepository.signup({name, email, password: hashPassword});
 }
 
+async function signin ({ email, password }) {
+    const { rowCount, rows: [user],} = await patientRepository.findByEmail(email);
+    if (!rowCount) throw new Error("Incorrect email or password");
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) throw new Error("Incorrect email or password");
+
+    const token = uuidV4();
+
+    const { rows: [logged],} = await patientRepository.getSessionsById(user.id);
+    if (logged) {
+        await patientRepository.updateSession(token, logged.patient_id);
+    } else {
+        await patientRepository.signin({ patient_token: token, patient_id: user.id });
+    }
+
+    return token;
+}
+
 export default {
-    signup
+    signup,
+    signin
 }

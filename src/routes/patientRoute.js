@@ -3,9 +3,9 @@ import patientController from "../controllers/patientController.js";
 import { validateSchema } from "../middlewares/schemaValidationMiddleware.js";
 import { patientSchemma } from "../schemas/Patient.js";
 
-
 const patientRoute = Router();
 
 patientRoute.post('/signup', validateSchema(patientSchemma), patientController.signup)
+patientRoute.post('/signin', patientController.signin)
 
 export default patientRoute;
