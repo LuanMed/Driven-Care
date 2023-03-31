@@ -13,6 +13,12 @@ async function searchSchedules(id){
     return rows;
 }
 
+async function getAppointments(id){
+    const { rows, rowCount } = await appointmentRepository.getAppointments(id);
+    if (!rowCount) throw errors.notFoundError();
+    return rows;
+}
+
 async function makeAppointment(id, patient){
     const { rows: [schedule], rowCount } = await appointmentRepository.getSchedule(id);
     if (!rowCount) throw errors.notFoundError();
@@ -25,5 +31,6 @@ async function makeAppointment(id, patient){
 export default {
     searchDoctor,
     searchSchedules,
+    getAppointments,
     makeAppointment
 }

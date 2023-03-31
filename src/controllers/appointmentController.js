@@ -20,6 +20,16 @@ async function searchSchedules(req, res, next){
     }
 }
 
+async function getAppointments(req, res, next){
+    const { id } = res.locals.user;
+    try {
+        const appointments = await appointmentService.getAppointments(id);
+        res.status(200).send(appointments)
+    } catch (err) {
+        next(err)
+    }
+}
+
 async function makeAppointment(req, res, next){
     const { id } = req.params;
     const patient = res.locals.user;
@@ -35,5 +45,6 @@ async function makeAppointment(req, res, next){
 export default {
     searchDoctor,
     searchSchedules,
+    getAppointments,
     makeAppointment
 }

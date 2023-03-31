@@ -22,7 +22,18 @@ async function searchSchedules(id) {
 
 async function getSchedule(id) {
     return await db.query(`
-    SELECT * FROM schedules WHERE id = $1
+    SELECT * FROM schedules WHERE id = $1;
+    `, [id]
+    );
+}
+
+async function getAppointments(id) {
+    return await db.query(`
+    SELECT a.id, s.time, s.date, d.name doctor, d.specialty
+    FROM appointments a
+    JOIN schedules s ON a.schedule_id = s.id
+    JOIN doctors d ON s.doctor_id = d.id
+    WHERE a.patient_id = $1;
     `, [id]
     );
 }
@@ -30,7 +41,7 @@ async function getSchedule(id) {
 async function makeAppointment(schedule_id, patient_id) {
     await db.query(`
     INSERT INTO appointments (patient_id, schedule_id, state)
-    VALUES ($1, $2, 'created')
+    VALUES ($1, $2, 'created');
     `, [patient_id, schedule_id]
     );
 }
@@ -46,6 +57,7 @@ export default {
     searchDoctor,
     searchSchedules,
     getSchedule,
+    getAppointments,
     makeAppointment,
     updateSchedule
 }
