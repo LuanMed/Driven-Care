@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import patientRepository from "../repositories/patientRepository.js";
 import { v4 as uuidV4 } from "uuid";
+import errors from "../errors/index.js";
 
 async function signup ({name, email, password}) {
     const { rowCount } = await patientRepository.findByEmail(email);
-    if (rowCount) throw new Error("User already exists");
+    if (rowCount) throw errors.duplicatedEmailError(email);
 
     const hashPassword = await bcrypt.hash(password, 10);
     await patientRepository.signup({name, email, password: hashPassword});
@@ -12,10 +13,10 @@ async function signup ({name, email, password}) {
 
 async function signin ({ email, password }) {
     const { rowCount, rows: [user],} = await patientRepository.findByEmail(email);
-    if (!rowCount) throw new Error("Incorrect email or password");
+    if (!rowCount) throw errors.invalidCredentialsError();
 
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) throw new Error("Incorrect email or password");
+    if (!validPassword) throw errors.invalidCredentialsError();
 
     const token = uuidV4();
 

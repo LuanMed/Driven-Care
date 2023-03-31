@@ -1,3 +1,4 @@
+import errors from "../errors/index.js";
 import doctorRepository from "../repositories/doctorRepository.js";
 
 async function authDoctorValidation(req, res, next){
@@ -8,15 +9,15 @@ async function authDoctorValidation(req, res, next){
 
     try {
         const { rows: [session],} = await doctorRepository.findSessionByToken(token);
-        if (!session) return res.status(401).send("Session not found");
+        if (!session) throw errors.unauthorizedError();
 
-        const { rows: [user],} = await doctorRepository.findById(session.userId);
-        if (!user) return res.status(401).send("User not found");
+        const { rows: [user],} = await doctorRepository.findById(session.doctor_id);
+        if (!user) throw errors.notFoundError();
 
         res.locals.user = user;
         next();
     } catch (err) {
-        res.status(500).send(err.message);
+        next(err);
     }
 }
 

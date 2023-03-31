@@ -9,12 +9,27 @@ async function findByEmail(email) {
     );
 }
 
+async function findById(id) {
+    return await db.query(`
+    SELECT * FROM patients WHERE id = $1
+    `,
+        [id]
+    );
+}
+
 async function getSessionsById(id) {
     return await db.query(
         `
     SELECT * FROM patient_sessions WHERE patient_id=$1;
     `,
         [id]);
+}
+
+async function findSessionByToken(token) {
+    return await db.query(`
+    SELECT * FROM patient_sessions WHERE patient_token = $1
+    `,
+        [token]);
 }
 
 async function signup({ name, email, password }) {
@@ -37,7 +52,7 @@ async function signin({ patient_token, patient_id }) {
     );
 }
 
-async function updateSession(patient_token, patient_id){
+async function updateSession(patient_token, patient_id) {
     return await db.query(`
         UPDATE patient_sessions SET patient_token=$1 WHERE id=$2;
     `, [patient_token, patient_id]);
@@ -45,7 +60,9 @@ async function updateSession(patient_token, patient_id){
 
 export default {
     findByEmail,
+    findById,
     getSessionsById,
+    findSessionByToken,
     signup,
     signin,
     updateSession
