@@ -9,12 +9,27 @@ async function findByEmail(email) {
     );
 }
 
+async function findById(id) {
+    return await db.query(`
+    SELECT * FROM doctors WHERE id = $1
+    `,
+        [id]
+    );
+}
+
 async function getSessionsById(id) {
     return await db.query(
         `
     SELECT * FROM doctor_sessions WHERE doctor_id=$1;
     `,
         [id]);
+}
+
+async function findSessionByToken(token) {
+    return await db.query(`
+    SELECT * FROM doctor_sessions WHERE doctor_token = $1
+    `,
+        [token]);
 }
 
 async function signup({ name, email, password, specialty, location, crm }) {
@@ -45,7 +60,9 @@ async function updateSession(doctor_token, doctor_id){
 
 export default {
     findByEmail,
+    findById,
     getSessionsById,
+    findSessionByToken,
     signup,
     signin,
     updateSession

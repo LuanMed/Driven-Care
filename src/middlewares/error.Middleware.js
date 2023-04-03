@@ -25,8 +25,14 @@ export function handleApplicationErrors(err, req, res, next) {
     });
   }
 
+  if (err.code === "22P02") {
+    return res.status(httpStatus.CONFLICT).send({
+      message: err.message,
+    })
+  }
+
   return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
     error: "InternalServerError",
-    message: "Internal Server Error",
+    message: err.message,
   });
 }
